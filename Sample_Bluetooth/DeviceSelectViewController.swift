@@ -30,6 +30,10 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         super.viewDidLoad()
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
         print("start")
+        print(peripheral)
+        peripheral.delegate = self
+        peripheral.discoverServices([self.serviceUUID])
+        //peripheral.discoverCharacteristics(nil, for: (peripheral.services?.first)!)
         //self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
     }
     

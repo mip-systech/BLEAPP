@@ -123,7 +123,7 @@ extension DeviceListViewController: CBCentralManagerDelegate {
         //let deviceSelectVC = DeviceSelectViewController()
         deviceSelectVC.setPeripheral(target: self.targetPeripheral)
         deviceSelectVC.setCentralManager(manager: self.centralManager)
-        deviceSelectVC.searchService()
+        //deviceSelectVC.searchService()
         deviceSelectVC.modalTransitionStyle = UIModalTransitionStyle.partialCurl
         // pushViewController での場合
         self.navigationController!.pushViewController(deviceSelectVC, animated: true)
