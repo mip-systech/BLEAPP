@@ -9,7 +9,7 @@
 import Foundation
 import RealmSwift
 
-class DeviceRealm: Object {
+class DeviceInfoModel: Object {
     @objc dynamic var key = ""
     @objc dynamic var name = ""
     @objc dynamic var pereipheralIdentify = ""
@@ -18,6 +18,5 @@ class DeviceRealm: Object {
     override static func primaryKey() -> String? {
         return "key"
     }
+    
 }
-
-

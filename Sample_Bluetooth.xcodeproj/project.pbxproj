@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		314E30CB2147A9B800D6D10E /* accessRealmProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314E30CA2147A9B800D6D10E /* accessRealmProtocol.swift */; };
 		316B0FB4213526EE00B19FE5 /* realm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316B0FB3213526EE00B19FE5 /* realm.swift */; };
 		31751D37212FA208003BB529 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31751D36212FA208003BB529 /* AppDelegate.swift */; };
 		31751D39212FA208003BB529 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31751D38212FA208003BB529 /* ViewController.swift */; };
@@ -17,13 +18,13 @@
 		31751D4C212FC56E003BB529 /* DeviceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31751D4B212FC56E003BB529 /* DeviceListViewController.swift */; };
 		31751D4E212FC76C003BB529 /* MeasureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31751D4D212FC76C003BB529 /* MeasureViewController.swift */; };
 		31751D502133C168003BB529 /* DeviceSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31751D4F2133C168003BB529 /* DeviceSelectViewController.swift */; };
-		31782BF021393895003B1682 /* RealmFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31782BEF21393895003B1682 /* RealmFunction.swift */; };
 		3195ADD821352E0100849F7E /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3195ADD721352E0100849F7E /* RealmSwift.framework */; };
 		3195ADDA21352E0500849F7E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3195ADD921352E0500849F7E /* Realm.framework */; };
 		6349BD0355095957FCED27E9 /* Pods_Sample_Bluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E286CD4EB388073C50CE7CFD /* Pods_Sample_Bluetooth.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		314E30CA2147A9B800D6D10E /* accessRealmProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = accessRealmProtocol.swift; sourceTree = "<group>"; };
 		316B0FB3213526EE00B19FE5 /* realm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = realm.swift; sourceTree = "<group>"; };
 		31751D33212FA208003BB529 /* Sample_Bluetooth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sample_Bluetooth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		31751D36212FA208003BB529 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -36,7 +37,6 @@
 		31751D4B212FC56E003BB529 /* DeviceListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListViewController.swift; sourceTree = "<group>"; };
 		31751D4D212FC76C003BB529 /* MeasureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureViewController.swift; sourceTree = "<group>"; };
 		31751D4F2133C168003BB529 /* DeviceSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSelectViewController.swift; sourceTree = "<group>"; };
-		31782BEF21393895003B1682 /* RealmFunction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmFunction.swift; sourceTree = "<group>"; };
 		3195ADD721352E0100849F7E /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3195ADD921352E0500849F7E /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A76DC99417C098DBAF638B0 /* Pods-Sample_Bluetooth.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sample_Bluetooth.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Sample_Bluetooth/Pods-Sample_Bluetooth.debug.xcconfig"; sourceTree = "<group>"; };
@@ -116,8 +116,8 @@
 		31782BF221393FDD003B1682 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
-				31782BEF21393895003B1682 /* RealmFunction.swift */,
 				316B0FB3213526EE00B19FE5 /* realm.swift */,
+				314E30CA2147A9B800D6D10E /* accessRealmProtocol.swift */,
 			);
 			name = Realm;
 			sourceTree = "<group>";
@@ -247,9 +247,9 @@
 			files = (
 				31751D39212FA208003BB529 /* ViewController.swift in Sources */,
 				31751D37212FA208003BB529 /* AppDelegate.swift in Sources */,
+				314E30CB2147A9B800D6D10E /* accessRealmProtocol.swift in Sources */,
 				31751D502133C168003BB529 /* DeviceSelectViewController.swift in Sources */,
 				316B0FB4213526EE00B19FE5 /* realm.swift in Sources */,
-				31782BF021393895003B1682 /* RealmFunction.swift in Sources */,
 				31751D4C212FC56E003BB529 /* DeviceListViewController.swift in Sources */,
 				31751D4E212FC76C003BB529 /* MeasureViewController.swift in Sources */,
 			);

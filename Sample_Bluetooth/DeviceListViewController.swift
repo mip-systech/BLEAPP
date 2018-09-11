@@ -20,6 +20,8 @@ class DeviceListViewController: UIViewController {
     var targetPeripheral: CBPeripheral!
     var centralManager: CBCentralManager!
 
+    // Realm
+    
     
     @IBOutlet weak var RegisterTableView: UITableView!
     
@@ -132,4 +134,53 @@ extension DeviceListViewController: CBCentralManagerDelegate {
         print("not connect")
     }
 }
+extension DeviceListViewController: accessRealm {
 
+    func getRealm() -> Realm {
+        let realm = try! Realm()
+        return realm
+    }
+    func getAll() -> Results<ResultType>? {
+        let realm = getRealm()
+        return realm.objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
+    }
+    func add(object: Object){
+        let realm = getRealm()
+        try! realm.write {
+            realm.add(object)
+        }
+    }
+    func getByKey(key: String) -> ResultType? {
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("key = '\(key)'")
+        if datas.count > 0 {
+            return datas[0]
+        } else {
+            return nil
+        }
+    }
+    func set(data: Object) -> Bool {
+        let realm = getRealm()
+        do {
+            try realm.write {
+                realm.add(data,update:true)
+            }
+            return true
+        } catch {
+            print("\n Error")
+        }
+        return false
+    }
+    func delete(data: Object) -> Bool {
+        let realm = getRealm()
+        do {
+            try realm.write {
+                realm.delete(data)
+            }
+            return true
+        } catch {
+            print("\n Error:")
+        }
+        return false
+    }
+}
