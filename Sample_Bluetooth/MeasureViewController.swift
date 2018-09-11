@@ -24,15 +24,16 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     
     
     
-    @IBOutlet var deviceID: UILabel!//ペリフェラルのID表示部分
-    @IBOutlet var deviceNAME: UILabel!//ペリヘラルの名前表示部分
-    @IBOutlet var value: UILabel!//ペリフェラルから受信した値の表示部分
+    @IBOutlet var deviceID: UILabel!
+    @IBOutlet var deviceNAME: UILabel!
+    
     @IBOutlet var value01: UITextField!
     @IBOutlet var value02: UITextField!
     @IBOutlet var value03: UITextField!
     @IBOutlet var value04: UITextField!
     @IBOutlet var value05: UITextField!
     @IBOutlet var value06: UITextField!
+    
     var focus_textfield: UITextField!
     
     
@@ -47,8 +48,6 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         self.value04.delegate = self
         self.value05.delegate = self
         self.value06.delegate = self
-        
-        value.numberOfLines = 100
     }
     
     override func didReceiveMemoryWarning() {
@@ -157,15 +156,15 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         switch characteristic.uuid{
         case self.charactaristicUUID_name:
             self.devicename = String(data: characteristic.value!, encoding: .utf8)
-            print(self.devicename)
+            print(self.devicename!)
             self.deviceNAME.text = self.devicename
         case self.characteristicUUID_id:
             self.deviceid = String(data: characteristic.value!, encoding: .utf8)
-            print(self.deviceid)
+            print(self.deviceid!)
             self.deviceID.text = self.deviceid
         case self.charactaristicUUID_value:
             self.devicevalue = String(data: characteristic.value!, encoding: .utf8)
-            print(self.devicevalue)
+            print(self.devicevalue!)
             self.focus_textfield.text = self.devicevalue
             //self.value.text = ("\(self.value.text!)\n\(self.devicevalue)")
             
@@ -180,6 +179,8 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
             print("指定外のキャラクタリスティック のレスポンスを検出")
         }
     }
+    
+    
     
 }
 
