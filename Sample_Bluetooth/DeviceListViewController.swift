@@ -136,15 +136,17 @@ extension DeviceListViewController: CBCentralManagerDelegate {
 }
 extension DeviceListViewController: accessRealm {
 
+    typealias ResultType = Object
+    
     func getRealm() -> Realm {
         let realm = try! Realm()
         return realm
     }
-    func getAll() -> Results<ResultType>? {
-        let realm = getRealm()
-        return realm.objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
-    }
-    func add(object: Object){
+    //func getAll() -> Results<ResultType>? {
+    //    let realm = getRealm()
+    //    return realm.objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
+    //}
+    func add(object: ResultType){
         let realm = getRealm()
         try! realm.write {
             realm.add(object)

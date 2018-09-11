@@ -13,7 +13,7 @@ protocol accessRealm {
     //typealias ResultType = Object
     associatedtype ResultType: Object
     func getRealm() -> Realm
-    func getAll() -> Results<ResultType>?
+    //func getAll() -> Results<ResultType>?
     func add(object: ResultType)
     func getByKey(key: String) -> ResultType?
     func set(data: Object) -> Bool
