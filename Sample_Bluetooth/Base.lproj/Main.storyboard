@@ -67,25 +67,23 @@
                                     <segue destination="f3R-Jx-DcQ" kind="show" id="BaR-tz-aTg"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="装置未選択" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HFY-0F-bD7">
-                                <rect key="frame" x="35" y="101" width="285" height="106"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="26"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="msj-c9-jlQ">
+                                <rect key="frame" x="492" y="312" width="152" height="133"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="23"/>
+                                <state key="normal" title="検出"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="lr5-QM-VEW"/>
                     </view>
                     <connections>
-                        <outlet property="DeviceInfo" destination="HFY-0F-bD7" id="2Me-Aq-yYh"/>
                         <outlet property="MeasureToDevice" destination="Unh-jR-WqN" id="6VW-tp-gPy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xcc-Fv-cJd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="904.79999999999995" y="400.74962518740631"/>
+            <point key="canvasLocation" x="904.6875" y="400.1953125"/>
         </scene>
         <!--Device List View Controller-->
         <scene sceneID="jGu-kZ-NKl">
