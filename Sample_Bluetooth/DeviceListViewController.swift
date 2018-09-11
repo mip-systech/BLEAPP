@@ -81,7 +81,8 @@ extension DeviceListViewController: CBCentralManagerDelegate {
             print("Bluetooth:Off")
         case .poweredOn:
             print("Bluetooth:On")
-            let serviceUUID = CBUUID(string: "0x180A")
+            //let serviceUUID = CBUUID(string: "0x180A")
+            let serviceUUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
             let scanServices:[CBUUID] = [serviceUUID]
             centralManager.scanForPeripherals(withServices: scanServices)
         case .resetting:
@@ -117,7 +118,9 @@ extension DeviceListViewController: CBCentralManagerDelegate {
     }
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("connect")
-        let deviceSelectVC = DeviceSelectViewController()
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let deviceSelectVC = storyboard.instantiateViewController(withIdentifier: "DeviceSelectVC") as!  DeviceSelectViewController
+        //let deviceSelectVC = DeviceSelectViewController()
         deviceSelectVC.setPeripheral(target: self.targetPeripheral)
         deviceSelectVC.setCentralManager(manager: self.centralManager)
         deviceSelectVC.searchService()

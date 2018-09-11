@@ -197,7 +197,7 @@
         <!--Device Select View Controller-->
         <scene sceneID="riC-dC-ZUB">
             <objects>
-                <viewController id="9ZK-ob-s8d" customClass="DeviceSelectViewController" customModule="Sample_Bluetooth" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DeviceSelectVC" useStoryboardIdentifierAsRestorationIdentifier="YES" id="9ZK-ob-s8d" customClass="DeviceSelectViewController" customModule="Sample_Bluetooth" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DBg-rM-b9T">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
