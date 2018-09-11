@@ -41,9 +41,9 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         super.didReceiveMemoryWarning()
     }
     
-    @IBAction func scanbutton(_ sender: Any) {
-        self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
-    }
+    //@IBAction func scanbutton(_ sender: Any) {
+    //    self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
+    //}
     
     // 追加
     // ここからが前のページからperipheral,centralmanagerを引き継ぐ関数
@@ -74,6 +74,7 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         print("state: \(central.state)")
     }
     
+    /*
     //ペリフェラルを検出した時に呼び出される
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         print("発見したBLEデバイス:\(peripheral.identifier)")
@@ -95,6 +96,7 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         print("接続失敗")
     }
+    */
     //ペリフェラルのサービスを検出した時に呼び出される
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         print("サービス検出")
@@ -167,13 +169,16 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         print("切断")
     }
     
-    //完了ボタン押す
+    
+ 
     @IBAction func done(_ sender: Any) {
         self.isdone = true
         self.centralManager.connect(self.peripheral, options: nil)
     }
-    //cancelボタン押す
+    
     @IBAction func cancel(_ sender: Any) {
+        
+        
     }
     
     
