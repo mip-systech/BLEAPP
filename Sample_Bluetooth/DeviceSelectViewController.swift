@@ -21,10 +21,11 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     var devicename:String?
     
     var isdone:Bool = false
-    
-    
     @IBOutlet var name: UITextField!
     
+    // Realm
+    var allDevice: Results<DeviceInfoModel>!
+    let deviceInfo = DeviceInfoModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -184,8 +185,67 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         
         
     }
+}
+
+
+extension DeviceSelectViewController: accessRealm {
     
+    typealias ResultType = Object
     
-    
-    
+    func getRealm() -> Realm {
+        let realm = try! Realm()
+        return realm
+    }
+    //func getAll() -> Results<ResultType>? {
+    //    let realm = getRealm()
+    //    return realm.objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
+    //}
+    func add(object: ResultType){
+        let realm = getRealm()
+        try! realm.write {
+            realm.add(object)
+        }
+    }
+    func getByKey(key: String) -> ResultType? {
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("key = '\(key)'")
+        if datas.count > 0 {
+            return datas[0]
+        } else {
+            return nil
+        }
+    }
+    func getByStatus(status: Int) -> ResultType? {
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("connectState = '\(status)'")
+        if datas.count > 0 {
+            return datas[0]
+        } else {
+            return nil
+        }
+    }
+    func set(data: Object) -> Bool {
+        let realm = getRealm()
+        do {
+            try realm.write {
+                realm.add(data,update:true)
+            }
+            return true
+        } catch {
+            print("\n Error")
+        }
+        return false
+    }
+    func delete(data: Object) -> Bool {
+        let realm = getRealm()
+        do {
+            try realm.write {
+                realm.delete(data)
+            }
+            return true
+        } catch {
+            print("\n Error:")
+        }
+        return false
+    }
 }
