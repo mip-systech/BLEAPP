@@ -93,18 +93,18 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         print("state: \(central.state)")
     }
     
-    /*
+    
     //ペリフェラルを検出した時に呼び出される
+    /*
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         print("発見したBLEデバイス:\(peripheral.identifier)")
         let uuid = peripheral.identifier.uuidString
-        //if uuid == "090C2471-2BF2-6448-5C28-BA3C2C01645B"{//ミップスタッフのiphone(2) DBに登録されている装置のUUIDに変更
         if uuid == "91B7541E-A6DC-2484-2DB4-57CF8F0A114E"{//テスト用iPad
             self.peripheral = peripheral
             self.centralManager.connect(self.peripheral, options: nil)
         }
     }
-    
+ */
     //ペリフェラとのコネクトに成功した時に呼び出される
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("接続成功")
@@ -115,7 +115,7 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         print("接続失敗")
     }
-    */
+    
     //ペリフェラルのサービスを検出した時に呼び出される
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         print("サービス検出")
@@ -150,9 +150,9 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
                         let namedata: Data? = name.text?.data(using: .utf8)!
                         self.peripheral.writeValue(namedata!, for: charactaristic, type: CBCharacteristicWriteType.withResponse)
                     }
-                //case self.characteristicUUID_id:
-                //    print("read id")
-                //    peripheral.readValue(for: characteristic)
+                case self.characteristicUUID_id:
+                    print("read id")
+                    peripheral.readValue(for: characteristic)
                 default:
                     print("指定外のキャラクタリスティック を検出")
                 }
@@ -169,16 +169,16 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
             self.devicename = String(data: characteristic.value!, encoding: .utf8)
             print(self.devicename)
             self.name.text = self.devicename            //readしたら接続をきる
-         //   if self.deviceid != nil{
+            if self.deviceid != nil{
                 self.centralManager.cancelPeripheralConnection(self.peripheral)
                 print("切断")
-       //     }
-       // case self.characteristicUUID_id:
-       //     self.deviceid = String(data: characteristic.value!, encoding: .utf8)
-       //     if self.devicename != nil{
-       //         self.centralManager.cancelPeripheralConnection(self.peripheral)
-       //         print("切断")
-       //     }
+            }
+        case self.characteristicUUID_id:
+            self.deviceid = String(data: characteristic.value!, encoding: .utf8)
+            if self.devicename != nil{
+                self.centralManager.cancelPeripheralConnection(self.peripheral)
+                print("切断")
+            }
         default:
             print("指定外のキャラクタリスティック のレスポンスを検出")
         }
