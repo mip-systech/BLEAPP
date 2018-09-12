@@ -12,7 +12,7 @@ import CoreBluetooth
 
 
 
-class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeripheralDelegate,UITextFieldDelegate {
+class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeripheralDelegate,UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource {
     var centralManager: CBCentralManager!
     var peripheral: CBPeripheral!
     let serviceUUID:CBUUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
@@ -56,17 +56,22 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         // Dispose of any resources that can be recreated.
     }
     
+    //画面遷移時
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if self.peripheral != nil{
+            //切断
             self.centralManager.cancelPeripheralConnection(self.peripheral)
+            print("切断")
+            //デバイス情報を初期化
+            resetUI()
         }
     }
+    
     
     @IBAction func DeviceListButton(_ sender: Any) {
         let storyboard: UIStoryboard = self.storyboard!
         let deviceVC = storyboard.instantiateViewController(withIdentifier: "DeviceListVC") as! DeviceListViewController
-        self.navigationController?.pushViewController(deviceVC, animated: true)
-        //self.performSegue(withIdentifier: "MeasurementToDeviceList", sender: nil)
+        //self.navigationController?.pushViewController(deviceVC, animated: true)
     }
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
@@ -78,40 +83,56 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     //centralManagerが更新した時に呼ばれる
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         print("state: \(central.state)")
+        insertlog(log: "state:\(central.state)")
+        switch central.state{
+        case CBManagerState.poweredOn:
+               self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
+               insertlog(log: "ペリフェラルをスキャン開始")
+            break
+        default:
+            break
+        }
     }
+   
+    
     
     @IBAction func scan(_ sender: Any) {
-        //周囲のペリフェラルを検出
-        //self.centralManager.scanForPeripherals(withServices: nil, options: nil)
+        print("scanstart")
         self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
     }
     
     //ペリフェラルを検出した時に呼び出される
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        print("発見したBLEデバイス:\(peripheral.identifier)")
+        print("ペリフェラル検出:\(peripheral.identifier)")
+        insertlog(log: "ペリフェラル検出:\(peripheral.identifier)")
         let uuid = peripheral.identifier.uuidString
         //if uuid == "090C2471-2BF2-6448-5C28-BA3C2C01645B"{//ミップスタッフのiphone(2) DBに登録されている装置のUUIDに変更
         if uuid == "91B7541E-A6DC-2484-2DB4-57CF8F0A114E"{//テスト用iPad
             self.peripheral = peripheral
             self.centralManager.connect(self.peripheral, options: nil)
+            insertlog(log: "ペリフェラルに接続開始:\(self.peripheral.identifier)")
         }
     }
     
     //ペリフェラとのコネクトに成功した時に呼び出される
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("接続成功")
+        print("ペリフェラルとの接続成功:\(peripheral.identifier)")
+        insertlog(log: "ペリフェラルとの接続成功:\(peripheral.identifier)")
         peripheral.delegate = self
         //let UUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
         peripheral.discoverServices([self.serviceUUID])
+        insertlog(log: "ペリフェラルのサービスを検索")
         //peripheral.discoverServices(nil)
     }
     //ペリフェラルのコネクトに失敗した時に呼び出される
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        print("接続失敗")
+        print("ペリフェラルとの接続失敗")
+        insertlog(log: "ペリフェラルとの接続失敗")
     }
     //ペリフェラルのサービスを検出した時に呼び出される
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         print("サービス検出")
+        insertlog(log: "サービス検出")
         if error != nil{
             print(error.debugDescription)
             return
@@ -119,6 +140,7 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         
         //キャラクタリスティック 検索
         peripheral.discoverCharacteristics(nil, for: (peripheral.services?.first)!)
+        insertlog(log: "ペリフェラルのキャラクタリスティック を検索")
     }
     
     //キャラクタリスティック 検出じに呼び出される
@@ -129,6 +151,7 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
             return
         }
         print("\(String(describing: service.characteristics?.count))個のキャラクタリスティック を検知")
+        insertlog(log: "\(String(describing: service.characteristics?.count))個のキャラクタリスティック を検出")
         
         for obj in characteristics!{
             if let characteristic = obj as? CBCharacteristic{
@@ -137,15 +160,19 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
                 switch characteristic.uuid{
                 case self.charactaristicUUID_name:
                     print("nameのキャラクタリスティック を検出")
+                    insertlog(log: "namenのキャラクタリスティック を検出")
                     peripheral.readValue(for: characteristic)
                 case self.charactaristicUUID_value:
                     print("valueのキャラクタリスティック を検出")
+                     insertlog(log: "valueのキャラクタリスティック を検出")
                     peripheral.setNotifyValue(true, for: characteristic)
                 case self.characteristicUUID_id:
                     print("idのキャラクタリスティック を検出")
+                    insertlog(log: "idのキャラクタリスティック を検出")
                     peripheral.readValue(for: characteristic)
                 default:
                     print("指定外のキャラクタリスティック を検出")
+                    insertlog(log: "指定外のキャラクタリスティック を検出")
                 }
             }
         }
@@ -154,19 +181,23 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     
     //readリクエストにレスポンスが返ってきたら呼び出される
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        insertlog(log: "readリクエストに対するレスポンスを検出")
         switch characteristic.uuid{
         case self.charactaristicUUID_name:
             self.devicename = String(data: characteristic.value!, encoding: .utf8)
             print(self.devicename!)
-            self.deviceNAME.text = self.devicename
+            insertlog(log: "\(self.devicename!)")
+            self.deviceNAME.text = "装置名：\(self.devicename!)"
         case self.characteristicUUID_id:
             self.deviceid = String(data: characteristic.value!, encoding: .utf8)
             print(self.deviceid!)
-            self.deviceID.text = self.deviceid
+            insertlog(log: "\(self.deviceid!)")
+            self.deviceID.text = "装置ID：\(self.deviceid!)"
         case self.charactaristicUUID_value:
             self.devicevalue = String(data: characteristic.value!, encoding: .utf8)
             print(self.devicevalue!)
-            self.focus_textfield.text = self.devicevalue
+            insertlog(log: "\(self.devicevalue!)")
+            self.focus_textfield.text = self.devicevalue!
             //self.value.text = ("\(self.value.text!)\n\(self.devicevalue)")
             
             //入力欄移動
@@ -178,11 +209,51 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
             
         default:
             print("指定外のキャラクタリスティック のレスポンスを検出")
+            insertlog(log: "指定外のキャラクタリスティック のレスポンスを検出")
         }
+    }
+    
+    func resetUI(){
+        self.value01.text = ""
+        self.value02.text = ""
+        self.value03.text = ""
+        self.value04.text = ""
+        self.value05.text = ""
+        self.value06.text = ""
+        self.deviceID.text = "装置ID："
+        self.deviceNAME.text = "装置名："
+    }
+    
+    
+    @IBOutlet var tableview: UITableView!
+    var cellstr = [String]()
+    //デバック表示
+    func insertlog(log:String){
+        cellstr.append("\(log)")
+        self.tableview.reloadData()
     }
     
     
     
+    
+    
+    //セルの個数を指定するデリゲートメソッド（必須）
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return cellstr.count
+    }
+    
+    //セルに値を設定するデータソースメソッド（必須）
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // セルを取得する
+        let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        // セルに表示する値を設定する
+        cell.textLabel!.text = cellstr[indexPath.row]
+        return cell
+    }
+    //セルを選択した時に呼ばれるメソッド（必須）
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("select cell")
+    }
 }
 
 
