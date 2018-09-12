@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 import CoreBluetooth
-
+import RealmSwift
 
 
 class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeripheralDelegate,UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource {
@@ -37,6 +37,9 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     
     var focus_textfield: UITextField!
     
+    // Realm
+    var allDevice: Results<DeviceInfoModel>!
+    let deviceInfo = DeviceInfoModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -107,7 +110,12 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         insertlog(log: "ペリフェラル検出:\(peripheral.identifier)")
         let uuid = peripheral.identifier.uuidString
         //if uuid == "090C2471-2BF2-6448-5C28-BA3C2C01645B"{//ミップスタッフのiphone(2) DBに登録されている装置のUUIDに変更
-        if uuid == "91B7541E-A6DC-2484-2DB4-57CF8F0A114E"{//テスト用iPad
+        
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("connectState = 1")
+        //print(datas.first)
+        //if uuid == "91B7541E-A6DC-2484-2DB4-57CF8F0A114E"{//テスト用iPad
+        if uuid == datas.first?.pereipheralIdentify{
             self.peripheral = peripheral
             self.centralManager.connect(self.peripheral, options: nil)
             insertlog(log: "ペリフェラルに接続開始:\(self.peripheral.identifier)")
@@ -256,4 +264,65 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     }
 }
 
+extension MeasureViewController: accessRealm {
+    
+    typealias ResultType = Object
+    
+    func getRealm() -> Realm {
+        let realm = try! Realm()
+        return realm
+    }
+    //func getAll() -> Results<ResultType>? {
+    //    let realm = getRealm()
+    //    return realm.objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
+    //}
+    func add(object: ResultType){
+        let realm = getRealm()
+        try! realm.write {
+            realm.add(object)
+        }
+    }
+    func getByKey(key: String) -> ResultType? {
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("key = '\(key)'")
+        if datas.count > 0 {
+            return datas[0]
+        } else {
+            return nil
+        }
+    }
+    func getByStatus(status: Int) -> ResultType? {
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("connectState = '\(status)'")
+        if datas.count > 0 {
+            return datas[0]
+        } else {
+            return nil
+        }
+    }
+    func set(data: Object) -> Bool {
+        let realm = getRealm()
+        do {
+            try realm.write {
+                realm.add(data,update:true)
+            }
+            return true
+        } catch {
+            print("\n Error")
+        }
+        return false
+    }
+    func delete(data: Object) -> Bool {
+        let realm = getRealm()
+        do {
+            try realm.write {
+                realm.delete(data)
+            }
+            return true
+        } catch {
+            print("\n Error:")
+        }
+        return false
+    }
+}
 

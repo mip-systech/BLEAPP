@@ -179,6 +179,14 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     @IBAction func done(_ sender: Any) {
         self.isdone = true
         self.centralManager.connect(self.peripheral, options: nil)
+        
+        //realm
+        let diviceinfodata = DeviceInfoModel()
+        diviceinfodata.name = name.text!
+        diviceinfodata.pereipheralIdentify = self.peripheral.identifier.uuidString
+        diviceinfodata.connectState = 1
+        
+        set(data: diviceinfodata)
     }
     
     @IBAction func cancel(_ sender: Any) {
