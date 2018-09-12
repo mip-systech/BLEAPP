@@ -47,7 +47,8 @@ class DeviceListViewController: UIViewController {
         RegisterTableView.delegate = self
         RegisterTableView.dataSource = self
 
-        
+        //let path = getRealm().configuration.fileURL
+        //print("realm path: \(path!)")
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -67,8 +68,12 @@ extension DeviceListViewController: UITableViewDelegate {
             let newSelected = allDevice[indexPath.row]
             for (device) in allDevice {
                 if device.connectState == 1 && device.key != newSelected.key {
-                    device.connectState = 0
-                    let oldStatus = set(data: device)
+                    let updateDevice = DeviceInfoModel()
+                    updateDevice.key = device.key
+                    updateDevice.name = device.name
+                    updateDevice.pereipheralIdentify = device.pereipheralIdentify
+                    updateDevice.connectState = 0
+                    let oldStatus = set(data: updateDevice)
                     print("old Selected Change \(oldStatus)")
                 }
             }
@@ -81,7 +86,6 @@ extension DeviceListViewController: UITableViewDelegate {
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView.tag == 2 {
-            print("table tag 1 : uuid \(self.uuids)")
             let cell1 = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DetectedCell")
             let uuid = self.uuids[indexPath.row]
             cell1.textLabel!.sizeToFit()
