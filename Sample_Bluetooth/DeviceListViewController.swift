@@ -58,7 +58,7 @@ class DeviceListViewController: UIViewController {
 extension DeviceListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if tableView.tag == 1 {
+        if tableView.tag == 2 {
             let uuid = self.uuids[indexPath.row]
             self.targetPeripheral = self.peripherals[uuid]
             self.centralManager.connect(self.targetPeripheral, options: nil)
@@ -80,7 +80,8 @@ extension DeviceListViewController: UITableViewDelegate {
         }
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if tableView.tag == 1 {
+        if tableView.tag == 2 {
+            print("table tag 1 : uuid \(self.uuids)")
             let cell1 = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DetectedCell")
             let uuid = self.uuids[indexPath.row]
             cell1.textLabel!.sizeToFit()
@@ -105,7 +106,7 @@ extension DeviceListViewController: UITableViewDelegate {
 }
 extension DeviceListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if tableView.tag == 1 {
+        if tableView.tag == 2 {
             return self.names.count
         } else {
             return allDevice.count
@@ -136,6 +137,7 @@ extension DeviceListViewController: CBCentralManagerDelegate {
         }
     }
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        print("discover Peripheral")
         let uuid = UUID(uuid: peripheral.identifier.uuid)
         let found = self.uuids.contains(uuid)
         if found == false {
@@ -154,6 +156,7 @@ extension DeviceListViewController: CBCentralManagerDelegate {
             //print("advertisementData \(advertisementData)")
             //print("peripheral.identifier.description \(peripheral.identifier.description)")
         }
+        //print("\(DetectedTableView.description)")
         DetectedTableView.reloadData()
     }
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
