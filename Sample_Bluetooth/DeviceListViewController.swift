@@ -97,11 +97,10 @@ extension DeviceListViewController: UITableViewDelegate {
             return cell1
         } else {
             let selectedDevice = allDevice[indexPath.row]
-            let checkedColor = selectedDevice.connectState == 1 ? UIColor.lightGray : UIColor.white
+            let checkedColor = selectedDevice.connectState == 1 ? UIColor.red : UIColor.black
             let cell2 = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "RegisteredCell")
             cell2.textLabel!.sizeToFit()
-            cell2.textLabel!.textColor = UIColor.red
-            cell2.textLabel!.backgroundColor = checkedColor
+            cell2.textLabel!.textColor = checkedColor
             cell2.textLabel!.font = UIFont.systemFont(ofSize: 18)
             cell2.textLabel!.text = selectedDevice.name
             return cell2
