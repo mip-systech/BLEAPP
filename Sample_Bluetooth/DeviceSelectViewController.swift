@@ -18,7 +18,9 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     var charactaristic: CBCharacteristic!
     let serviceUUID:CBUUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
     let charactaristicUUID_name:CBUUID = CBUUID(string: "810E2E4E-2E03-46F5-91FB-A238A8E127B5")
+    let characteristicUUID_id    = CBUUID(string: "362114A3-CDD5-4A68-812B-C2C63A1E0FA5")
     var devicename:String?
+    var deviceid:String?
     
     var isdone:Bool = false
     @IBOutlet var name: UITextField!
@@ -34,6 +36,18 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         print(peripheral)
         peripheral.delegate = self
         peripheral.discoverServices([self.serviceUUID])
+        allDevice = getRealm().objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
+        
+        
+        for (device) in allDevice {
+            print(device)
+            if device.connectState == 1  {
+                //device.connectState = 0
+                let oldStatus = set(data: device)
+                print("old Selected Change \(oldStatus)")
+            }
+        }
+ 
         //peripheral.discoverCharacteristics(nil, for: (peripheral.services?.first)!)
         //self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
     }
@@ -134,8 +148,11 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
                     }else{
                         print("nameのキャラクタリスティック を検出(write)")
                         let namedata: Data? = name.text?.data(using: .utf8)!
-                        self.peripheral.writeValue(namedata!, for: charactaristic, type: CBCharacteristicWriteType.withoutResponse)
+                        self.peripheral.writeValue(namedata!, for: charactaristic, type: CBCharacteristicWriteType.withResponse)
                     }
+                //case self.characteristicUUID_id:
+                //    print("read id")
+                //    peripheral.readValue(for: characteristic)
                 default:
                     print("指定外のキャラクタリスティック を検出")
                 }
@@ -151,10 +168,17 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         case self.charactaristicUUID_name:
             self.devicename = String(data: characteristic.value!, encoding: .utf8)
             print(self.devicename)
-            //readしたら接続をきる
-            self.name.text = self.devicename
-            self.centralManager.cancelPeripheralConnection(self.peripheral)
-            print("切断")
+            self.name.text = self.devicename            //readしたら接続をきる
+         //   if self.deviceid != nil{
+                self.centralManager.cancelPeripheralConnection(self.peripheral)
+                print("切断")
+       //     }
+       // case self.characteristicUUID_id:
+       //     self.deviceid = String(data: characteristic.value!, encoding: .utf8)
+       //     if self.devicename != nil{
+       //         self.centralManager.cancelPeripheralConnection(self.peripheral)
+       //         print("切断")
+       //     }
         default:
             print("指定外のキャラクタリスティック のレスポンスを検出")
         }
@@ -175,20 +199,20 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     }
     
     
- 
+ //完了ボタンを押した時
     @IBAction func done(_ sender: Any) {
+        print(self.peripheral)
         self.isdone = true
         self.centralManager.connect(self.peripheral, options: nil)
         
-        //realm
+        /*
         let diviceinfodata = DeviceInfoModel()
         diviceinfodata.name = name.text!
         diviceinfodata.pereipheralIdentify = self.peripheral.identifier.uuidString
         diviceinfodata.connectState = 1
-        
         set(data: diviceinfodata)
+        */
     }
-    
     @IBAction func cancel(_ sender: Any) {
         
         
