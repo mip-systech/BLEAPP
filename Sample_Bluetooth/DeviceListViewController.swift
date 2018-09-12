@@ -21,7 +21,9 @@ class DeviceListViewController: UIViewController {
     var centralManager: CBCentralManager!
 
     // Realm
-    
+    var allDevice: Results<DeviceInfoModel>!
+    let deviceInfo = DeviceInfoModel()
+
     
     @IBOutlet weak var RegisterTableView: UITableView!
     
@@ -38,7 +40,12 @@ class DeviceListViewController: UIViewController {
         self.peripherals = [:]
         centralManager = CBCentralManager(delegate: self, queue: nil, options: nil)
         
-        // var debug = getConstructDeviceRealm()
+        //realm
+        allDevice = getRealm().objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
+        print("Devices \(allDevice)")
+        
+        RegisterTableView.delegate = self
+        RegisterTableView.dataSource = self
 
         
     }
@@ -51,25 +58,58 @@ class DeviceListViewController: UIViewController {
 extension DeviceListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let uuid = self.uuids[indexPath.row]
-        self.targetPeripheral = self.peripherals[uuid]
-        self.centralManager.connect(self.targetPeripheral, options: nil)
+        if tableView.tag == 1 {
+            let uuid = self.uuids[indexPath.row]
+            self.targetPeripheral = self.peripherals[uuid]
+            self.centralManager.connect(self.targetPeripheral, options: nil)
+        } else {
+            //Register table
+            let newSelected = allDevice[indexPath.row]
+            for (device) in allDevice {
+                if device.connectState == 1 && device.key != newSelected.key {
+                    device.connectState = 0
+                    let oldStatus = set(data: device)
+                    print("old Selected Change \(oldStatus)")
+                }
+            }
+            if newSelected.connectState == 0 {
+                newSelected.connectState = 1
+                let newStatus = set(data: newSelected)
+                print("select New Change \(newStatus)")
+            }
+        }
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "RVcell")
-        let uuid = self.uuids[indexPath.row]
-        cell.textLabel!.sizeToFit()
-        cell.textLabel!.textColor = UIColor.blue
-        cell.textLabel!.font = UIFont.systemFont(ofSize: 18)
-        cell.textLabel!.text = self.names[uuid]
-        cell.detailTextLabel!.font = UIFont.systemFont(ofSize: 12)
-        cell.detailTextLabel!.text = uuid.description
-        return cell
+        if tableView.tag == 1 {
+            let cell1 = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DetectedCell")
+            let uuid = self.uuids[indexPath.row]
+            cell1.textLabel!.sizeToFit()
+            cell1.textLabel!.textColor = UIColor.blue
+            cell1.textLabel!.font = UIFont.systemFont(ofSize: 18)
+            cell1.textLabel!.text = self.names[uuid]
+            cell1.detailTextLabel!.font = UIFont.systemFont(ofSize: 12)
+            cell1.detailTextLabel!.text = uuid.description
+            return cell1
+        } else {
+            let selectedDevice = allDevice[indexPath.row]
+            let checkedColor = selectedDevice.connectState == 1 ? UIColor.lightGray : UIColor.white
+            let cell2 = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "RegisteredCell")
+            cell2.textLabel!.sizeToFit()
+            cell2.textLabel!.textColor = UIColor.red
+            cell2.textLabel!.backgroundColor = checkedColor
+            cell2.textLabel!.font = UIFont.systemFont(ofSize: 18)
+            cell2.textLabel!.text = selectedDevice.name
+            return cell2
+        }
     }
 }
 extension DeviceListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.names.count
+        if tableView.tag == 1 {
+            return self.names.count
+        } else {
+            return allDevice.count
+        }
     }
 }
 
@@ -120,12 +160,11 @@ extension DeviceListViewController: CBCentralManagerDelegate {
         print("connect")
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let deviceSelectVC = storyboard.instantiateViewController(withIdentifier: "DeviceSelectVC") as!  DeviceSelectViewController
-        //let deviceSelectVC = DeviceSelectViewController()
         deviceSelectVC.setPeripheral(target: self.targetPeripheral)
         deviceSelectVC.setCentralManager(manager: self.centralManager)
         //deviceSelectVC.searchService()
         deviceSelectVC.modalTransitionStyle = UIModalTransitionStyle.partialCurl
-        // pushViewController での場合
+        // pushViewController で遷移
         self.navigationController!.pushViewController(deviceSelectVC, animated: true)
         self.centralManager.stopScan()
     }
@@ -158,6 +197,15 @@ extension DeviceListViewController: accessRealm {
     func getByKey(key: String) -> ResultType? {
         let realm = getRealm()
         let datas = realm.objects(DeviceInfoModel.self).filter("key = '\(key)'")
+        if datas.count > 0 {
+            return datas[0]
+        } else {
+            return nil
+        }
+    }
+    func getByStatus(status: Int) -> ResultType? {
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("connectState = '\(status)'")
         if datas.count > 0 {
             return datas[0]
         } else {

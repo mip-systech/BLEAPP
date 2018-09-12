@@ -16,6 +16,7 @@ protocol accessRealm {
     //func getAll() -> Results<ResultType>?
     func add(object: ResultType)
     func getByKey(key: String) -> ResultType?
+    func getByStatus(status: Int) -> ResultType?
     func set(data: Object) -> Bool
     func delete(data: Object) -> Bool
     
