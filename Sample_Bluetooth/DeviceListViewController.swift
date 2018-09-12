@@ -68,19 +68,38 @@ extension DeviceListViewController: UITableViewDelegate {
             let newSelected = allDevice[indexPath.row]
             for (device) in allDevice {
                 if device.connectState == 1 && device.key != newSelected.key {
-                    let updateDevice = DeviceInfoModel()
-                    updateDevice.key = device.key
-                    updateDevice.name = device.name
-                    updateDevice.pereipheralIdentify = device.pereipheralIdentify
-                    updateDevice.connectState = 0
-                    let oldStatus = set(data: updateDevice)
-                    print("old Selected Change \(oldStatus)")
+                    //let updateDevice = DeviceInfoModel()
+                    //updateDevice.key = device.key
+                    //updateDevice.name = device.name
+                    //updateDevice.pereipheralIdentify = device.pereipheralIdentify
+                    //updateDevice.connectState = 0
+                    //let oldStatus = set(data: updateDevice)
+                    //print("old Selected Change \(oldStatus)")
+                    let realm = getRealm()
+                    do {
+                        try realm.write {
+                            device.connectState = 0
+                            realm.add(device,update:true)
+                        }
+                    } catch {
+                        print("\n Error")
+                    }
                 }
+                RegisterTableView.reloadData()
             }
             if newSelected.connectState == 0 {
-                newSelected.connectState = 1
-                let newStatus = set(data: newSelected)
-                print("select New Change \(newStatus)")
+                //newSelected.connectState = 1
+                //let newStatus = set(data: newSelected)
+                //print("select New Change \(newStatus)")
+                let realm = getRealm()
+                do {
+                    try realm.write {
+                        newSelected.connectState = 1
+                        realm.add(newSelected,update:true)
+                    }
+                } catch {
+                    print("\n Error")
+                }
             }
         }
     }
