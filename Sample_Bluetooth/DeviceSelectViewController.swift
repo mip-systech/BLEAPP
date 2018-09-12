@@ -21,6 +21,8 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     let characteristicUUID_id    = CBUUID(string: "362114A3-CDD5-4A68-812B-C2C63A1E0FA5")
     var devicename:String?
     var deviceid:String?
+    var connectuuid:String?
+    
     
     var isdone:Bool = false
     @IBOutlet var name: UITextField!
@@ -34,6 +36,7 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
         print("start")
         print(peripheral)
+        
         peripheral.delegate = self
         peripheral.discoverServices([self.serviceUUID])
         allDevice = getRealm().objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
@@ -41,11 +44,6 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         
         for (device) in allDevice {
             print(device)
-            if device.connectState == 1  {
-                //device.connectState = 0
-                let oldStatus = set(data: device)
-                print("old Selected Change \(oldStatus)")
-            }
         }
  
         //peripheral.discoverCharacteristics(nil, for: (peripheral.services?.first)!)
@@ -95,16 +93,16 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     
     
     //ペリフェラルを検出した時に呼び出される
-    /*
+    
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         print("発見したBLEデバイス:\(peripheral.identifier)")
         let uuid = peripheral.identifier.uuidString
-        if uuid == "91B7541E-A6DC-2484-2DB4-57CF8F0A114E"{//テスト用iPad
+        if uuid == self.connectuuid{//テスト用iPad
             self.peripheral = peripheral
             self.centralManager.connect(self.peripheral, options: nil)
         }
     }
- */
+ 
     //ペリフェラとのコネクトに成功した時に呼び出される
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("接続成功")
@@ -201,17 +199,33 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     
  //完了ボタンを押した時
     @IBAction func done(_ sender: Any) {
-        print(self.peripheral)
-        self.isdone = true
-        self.centralManager.connect(self.peripheral, options: nil)
+ 
         
-        /*
+        for (device) in allDevice {
+            if device.connectState == 1 {
+                let updateDevice = DeviceInfoModel()
+                updateDevice.key = device.key
+                updateDevice.name = device.name
+                updateDevice.pereipheralIdentify = device.pereipheralIdentify
+                updateDevice.connectState = 0
+                let oldStatus = set(data: updateDevice)
+                print("old Selected Change \(oldStatus)")
+            }
+        }
+        
         let diviceinfodata = DeviceInfoModel()
+        diviceinfodata.key = self.deviceid!
         diviceinfodata.name = name.text!
         diviceinfodata.pereipheralIdentify = self.peripheral.identifier.uuidString
         diviceinfodata.connectState = 1
         set(data: diviceinfodata)
-        */
+        
+        self.connectuuid = self.peripheral.identifier.uuidString
+        
+        print(self.peripheral)
+        self.isdone = true
+        
+        self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
     }
     @IBAction func cancel(_ sender: Any) {
         

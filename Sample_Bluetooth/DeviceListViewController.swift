@@ -47,8 +47,8 @@ class DeviceListViewController: UIViewController {
         RegisterTableView.delegate = self
         RegisterTableView.dataSource = self
 
-        //let path = getRealm().configuration.fileURL
-        //print("realm path: \(path!)")
+        let path = getRealm().configuration.fileURL
+        print("realm path: \(path!)")
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
