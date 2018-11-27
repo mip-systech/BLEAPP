@@ -14,7 +14,7 @@ import RealmSwift
 
 class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeripheralDelegate,UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource {
     var centralManager: CBCentralManager!
-    var peripheral: CBPeripheral!
+    var peripheral: CBPeripheral!//
     let serviceUUID:CBUUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
     let charactaristicUUID_value:CBUUID = CBUUID(string: "9E21E0B1-6EAA-47B0-916A-23FAF3984207")
     let charactaristicUUID_name:CBUUID = CBUUID(string: "810E2E4E-2E03-46F5-91FB-A238A8E127B5")
