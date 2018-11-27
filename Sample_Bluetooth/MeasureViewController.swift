@@ -85,11 +85,20 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     
     //centralManagerが更新した時に呼ばれる
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        print("state: \(central.state)")
         insertlog(log: "state:\(central.state)")
         switch central.state{
         case CBManagerState.poweredOn:
-               self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
+               //self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
+            //接続したことがあるペリフェラルから接続
+            let realm = getRealm()
+            let datas = realm.objects(DeviceInfoModel.self).filter("connectState = 1")
+            let peluuid_str: NSString = datas.first?.pereipheralIdentify as! NSString
+            let peluuid:NSUUID = NSUUID(uuidString: peluuid_str as String)!
+            let pel = self.centralManager.retrievePeripherals(withIdentifiers: [peluuid as UUID])
+            
+            self.peripheral = pel.first
+            self.centralManager.connect(self.peripheral, options: nil)
+            
                insertlog(log: "ペリフェラルをスキャン開始")
             break
         default:
@@ -98,7 +107,7 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     }
    
     
-    
+    /*
     @IBAction func scan(_ sender: Any) {
         print("scanstart")
         self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
@@ -121,10 +130,9 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
             insertlog(log: "ペリフェラルに接続開始:\(self.peripheral.identifier)")
         }
     }
-    
+    */
     //ペリフェラとのコネクトに成功した時に呼び出される
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("ペリフェラルとの接続成功:\(peripheral.identifier)")
         insertlog(log: "ペリフェラルとの接続成功:\(peripheral.identifier)")
         peripheral.delegate = self
         //let UUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
@@ -134,15 +142,13 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     }
     //ペリフェラルのコネクトに失敗した時に呼び出される
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        print("ペリフェラルとの接続失敗")
         insertlog(log: "ペリフェラルとの接続失敗")
     }
     //ペリフェラルのサービスを検出した時に呼び出される
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        print("サービス検出")
         insertlog(log: "サービス検出")
         if error != nil{
-            print(error.debugDescription)
+            insertlog(log: "\(error.debugDescription)")
             return
         }
         
@@ -155,10 +161,9 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         let characteristics = service.characteristics
         if error != nil{
-            print(error.debugDescription)
+            insertlog(log:"\(error.debugDescription)")
             return
         }
-        print("\(String(describing: service.characteristics?.count))個のキャラクタリスティック を検知")
         insertlog(log: "\(String(describing: service.characteristics?.count))個のキャラクタリスティック を検出")
         
         for obj in characteristics!{
@@ -167,19 +172,15 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
                 print(characteristic.uuid)
                 switch characteristic.uuid{
                 case self.charactaristicUUID_name:
-                    print("nameのキャラクタリスティック を検出")
                     insertlog(log: "namenのキャラクタリスティック を検出")
                     peripheral.readValue(for: characteristic)
                 case self.charactaristicUUID_value:
-                    print("valueのキャラクタリスティック を検出")
                      insertlog(log: "valueのキャラクタリスティック を検出")
                     peripheral.setNotifyValue(true, for: characteristic)
                 case self.characteristicUUID_id:
-                    print("idのキャラクタリスティック を検出")
                     insertlog(log: "idのキャラクタリスティック を検出")
                     peripheral.readValue(for: characteristic)
                 default:
-                    print("指定外のキャラクタリスティック を検出")
                     insertlog(log: "指定外のキャラクタリスティック を検出")
                 }
             }
@@ -193,17 +194,14 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         switch characteristic.uuid{
         case self.charactaristicUUID_name:
             self.devicename = String(data: characteristic.value!, encoding: .utf8)
-            print(self.devicename!)
             insertlog(log: "\(self.devicename!)")
             self.deviceNAME.text = "装置名：\(self.devicename!)"
         case self.characteristicUUID_id:
             self.deviceid = String(data: characteristic.value!, encoding: .utf8)
-            print(self.deviceid!)
             insertlog(log: "\(self.deviceid!)")
             self.deviceID.text = "装置ID：\(self.deviceid!)"
         case self.charactaristicUUID_value:
             self.devicevalue = String(data: characteristic.value!, encoding: .utf8)
-            print(self.devicevalue!)
             insertlog(log: "\(self.devicevalue!)")
             self.focus_textfield.text = self.devicevalue!
             //self.value.text = ("\(self.value.text!)\n\(self.devicevalue)")
@@ -216,7 +214,6 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
             }
             
         default:
-            print("指定外のキャラクタリスティック のレスポンスを検出")
             insertlog(log: "指定外のキャラクタリスティック のレスポンスを検出")
         }
     }
@@ -238,6 +235,7 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
     //デバック表示
     func insertlog(log:String){
         cellstr.append("\(log)")
+        print("\(log)")
         self.tableview.reloadData()
     }
     
