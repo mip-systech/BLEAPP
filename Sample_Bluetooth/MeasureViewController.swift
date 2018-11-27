@@ -99,7 +99,7 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
             self.peripheral = pel.first
             self.centralManager.connect(self.peripheral, options: nil)
             
-               insertlog(log: "ペリフェラルをスキャン開始")
+               insertlog(log: "ペリフェラルに接続開始")
             break
         default:
             break
@@ -238,11 +238,6 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         print("\(log)")
         self.tableview.reloadData()
     }
-    
-    
-    
-    
-    
     //セルの個数を指定するデリゲートメソッド（必須）
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cellstr.count

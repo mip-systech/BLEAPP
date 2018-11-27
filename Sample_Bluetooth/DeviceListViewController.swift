@@ -29,11 +29,17 @@ class DeviceListViewController: UIViewController {
     
     @IBOutlet weak var DetectedTableView: UITableView!
     
+    @IBOutlet weak var LogTableView: UITableView!
+    var cellstr = [String]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         DetectedTableView.delegate = self
         DetectedTableView.dataSource = self
+        
+        LogTableView.delegate = self
+        LogTableView.dataSource = self
         
         self.uuids = []
         self.names = [:]
@@ -42,7 +48,8 @@ class DeviceListViewController: UIViewController {
         
         //realm
         allDevice = getRealm().objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
-        print("Devices \(allDevice)")
+        //print("Devices \(allDevice)")
+        insertlog(log: "登録済みデバイス:\(String(describing: allDevice))")
         
         RegisterTableView.delegate = self
         RegisterTableView.dataSource = self
@@ -102,9 +109,15 @@ extension DeviceListViewController: UITableViewDelegate {
                 }
             }
         }
+        
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if tableView.tag == 2 {
+        print("TAG = \(tableView.tag)")
+        if tableView.tag == 3{
+            let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            cell.textLabel!.text = cellstr[indexPath.row]
+            return cell
+        }else if tableView.tag == 2 {
             let cell1 = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DetectedCell")
             let uuid = self.uuids[indexPath.row]
             cell1.textLabel!.sizeToFit()
@@ -125,10 +138,20 @@ extension DeviceListViewController: UITableViewDelegate {
             return cell2
         }
     }
+    
+    //ログ表示
+    func insertlog(log:String){
+        cellstr.append("\(log)")
+        print("\(log)")
+        self.LogTableView.reloadData()
+    }
 }
 extension DeviceListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if tableView.tag == 2 {
+        
+        if tableView.tag == 3{
+         return cellstr.count
+        }else if tableView.tag == 2 {
             return self.names.count
         } else {
             return allDevice.count
@@ -141,25 +164,29 @@ extension DeviceListViewController: CBCentralManagerDelegate {
         print("state \(central.state)")
         switch central.state {
         case .poweredOff:
-            print("Bluetooth:Off")
+            insertlog(log: "Bluetooth:Off")
         case .poweredOn:
-            print("Bluetooth:On")
+            insertlog(log: "Bluetooth:On")
             //let serviceUUID = CBUUID(string: "0x180A")
             let serviceUUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
             let scanServices:[CBUUID] = [serviceUUID]
             centralManager.scanForPeripherals(withServices: scanServices)
+            insertlog(log: "スキャン開始")
         case .resetting:
-            print("resetting")
+            insertlog(log: "resetting")
         case .unsupported:
-            print("unsupported")
+            insertlog(log: "unsuported")
         case .unauthorized:
-            print("unauthorized")
+            insertlog(log: "unauthorized")
         default:
-            print("unknown")
+            insertlog(log: "unknown")
         }
     }
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        print("discover Peripheral")
+        //print("discover Peripheral")
+        insertlog(log: "ペリフェラル発見")
+        insertlog(log: "ペリフェラルUUID:\(peripheral.identifier.uuid)")
+        
         let uuid = UUID(uuid: peripheral.identifier.uuid)
         let found = self.uuids.contains(uuid)
         if found == false {
@@ -182,7 +209,8 @@ extension DeviceListViewController: CBCentralManagerDelegate {
         DetectedTableView.reloadData()
     }
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("connect")
+        //print("connect")
+        insertlog(log: "接続")
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let deviceSelectVC = storyboard.instantiateViewController(withIdentifier: "DeviceSelectVC") as!  DeviceSelectViewController
         deviceSelectVC.setPeripheral(target: self.targetPeripheral)
@@ -192,13 +220,16 @@ extension DeviceListViewController: CBCentralManagerDelegate {
         // pushViewController で遷移
         self.navigationController!.pushViewController(deviceSelectVC, animated: true)
         self.centralManager.stopScan()
+        insertlog(log: "スキャン停止")
     }
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         if let e = error {
-            print("ConnectError \(e.localizedDescription)")
+            //print("ConnectError \(e.localizedDescription)")
+            insertlog(log: "接続エラー\(e.localizedDescription)")
             return
         }
-        print("not connect")
+        //print("not connect")
+        insertlog(log: "接続失敗(エラーなし)")
     }
 }
 extension DeviceListViewController: accessRealm {
