@@ -238,6 +238,7 @@ class MeasureViewController: UIViewController,CBCentralManagerDelegate,CBPeriphe
         print("\(log)")
         self.tableview.reloadData()
     }
+
     //セルの個数を指定するデリゲートメソッド（必須）
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cellstr.count

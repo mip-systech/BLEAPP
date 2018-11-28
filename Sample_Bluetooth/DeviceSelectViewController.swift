@@ -19,9 +19,8 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     let serviceUUID:CBUUID = CBUUID(string: "135E7F5F-D98B-413C-A0BE-CAC8E3F53280")
     let charactaristicUUID_name:CBUUID = CBUUID(string: "810E2E4E-2E03-46F5-91FB-A238A8E127B5")
     let characteristicUUID_id    = CBUUID(string: "362114A3-CDD5-4A68-812B-C2C63A1E0FA5")
-    var devicename:String?
-    var deviceid:String?
     var connectuuid:String?
+    
     
     
     var isdone:Bool = false
@@ -38,7 +37,8 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         print(peripheral)
         
         peripheral.delegate = self
-        peripheral.discoverServices([self.serviceUUID])
+        //peripheral.discoverServices([self.serviceUUID])
+        setPeripheralName()//ペリフェラルの名前をテキストフィールドに代入
         allDevice = getRealm().objects(DeviceInfoModel.self).sorted(byKeyPath: "name")
         
         
@@ -79,7 +79,7 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
     }
     //ここまで
     
-    //画面遷移時に呼ばれる
+    //画面遷移時に呼ばれる(画面を離れる時)
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if self.peripheral != nil{
             self.centralManager.cancelPeripheralConnection(self.peripheral)
@@ -91,30 +91,15 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         print("state: \(central.state)")
     }
     
-    
-    //ペリフェラルを検出した時に呼び出される
-    
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        print("発見したBLEデバイス:\(peripheral.identifier)")
-        let uuid = peripheral.identifier.uuidString
-        if uuid == self.connectuuid{//テスト用iPad
-            self.peripheral = peripheral
-            self.centralManager.connect(self.peripheral, options: nil)
-        }
+    func setPeripheralName(){
+        let id = self.peripheral.identifier.uuidString
+        let realm = getRealm()
+        let datas = realm.objects(DeviceInfoModel.self).filter("pereipheralIdentify = \(id)")
+        let peripheralname = datas.first?.name
+        self.name.text = peripheralname
     }
- 
-    //ペリフェラとのコネクトに成功した時に呼び出される
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("接続成功")
-        peripheral.delegate = self
-        peripheral.discoverServices([self.serviceUUID])
-    }
-    //ペリフェラルのコネクトに失敗した時に呼び出される
-    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        print("接続失敗")
-    }
-    
-    //ペリフェラルのサービスを検出した時に呼び出される
+    /*
+    //ペリフェラルのサービスを検出した時に呼び出される(画面に入った時のフローで呼ばれる)
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         print("サービス検出")
         if error != nil{
@@ -181,22 +166,7 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
             print("指定外のキャラクタリスティック のレスポンスを検出")
         }
     }
-    
-    //wirteリクエストにレスポンスが返ってきたら呼び出される
-    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
-        if let error = error{
-            print("Write失敗...error:\(error)")
-            return
-        }
-        
-        print("Write成功")
-        //writeしたら接続をきる
-        self.centralManager.cancelPeripheralConnection(self.peripheral)
-        self.isdone = false
-        print("切断")
-    }
-    
-    
+    */
  //完了ボタンを押した時
     @IBAction func done(_ sender: Any) {
  
@@ -204,31 +174,39 @@ class DeviceSelectViewController:  UIViewController,CBCentralManagerDelegate,CBP
         for (device) in allDevice {
             if device.connectState == 1 {
                 let updateDevice = DeviceInfoModel()
-                updateDevice.key = device.key
+                //updateDevice.key = device.key
                 updateDevice.name = device.name
                 updateDevice.pereipheralIdentify = device.pereipheralIdentify
                 updateDevice.connectState = 0
-                let oldStatus = set(data: updateDevice)
-                print("old Selected Change \(oldStatus)")
+                //let oldStatus = set(data: updateDevice)
+                //print("old Selected Change \(oldStatus)")
             }
         }
         
+        let realm = getRealm()
+        let thisDevice = realm.objects(DeviceInfoModel.self).filter("pereipheralIdentify = \(self.peripheral.identifier.uuidString)").first
+        let maxid = realm.objects(DeviceInfoModel.self).sorted(byKeyPath: "id",ascending: false).first?.id
+        var thisid = 0;
+        if thisDevice != nil{
+            thisid = thisDevice?.id ?? 0
+        }else{
+            thisid = maxid ?? 0 + 1
+        }
+        
         let diviceinfodata = DeviceInfoModel()
-        diviceinfodata.key = self.deviceid!
+        //diviceinfodata.key = self.deviceid!
+        diviceinfodata.id = thisid
         diviceinfodata.name = name.text!
         diviceinfodata.pereipheralIdentify = self.peripheral.identifier.uuidString
         diviceinfodata.connectState = 1
         set(data: diviceinfodata)
         
         self.connectuuid = self.peripheral.identifier.uuidString
-        
-        print(self.peripheral)
-        self.isdone = true
-        
-        self.centralManager.scanForPeripherals(withServices: [self.serviceUUID], options: nil)
+
+        self.dismiss(animated: true, completion: nil)
     }
     @IBAction func cancel(_ sender: Any) {
-        
+        self.dismiss(animated: true, completion: nil)
         
     }
 }
